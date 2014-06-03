@@ -20,12 +20,6 @@ public class COGMember
 	 ******************************/
 	public COGMember(String aLine) throws IOException
 	{
-		//for(String s : aLine.split("\t") )
-		//{
-			//System.out.print(s + "\t");
-		//}
-		//System.out.print("\n");
-		//System.out.println(aLine);
 		this.COG = aLine.split("\t")[5];
 		this.description = aLine.split("\t")[6];
 		this.proteinName = aLine.split("\t")[4];

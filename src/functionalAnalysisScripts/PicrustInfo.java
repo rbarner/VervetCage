@@ -2,7 +2,7 @@ package functionalAnalysisScripts;
 
 import java.util.ArrayList;
 import java.util.List;
-import scripts.StringUtil;
+import functionalAnalysisScripts.StringUtil;
 
 public class PicrustInfo implements Comparable<PicrustInfo>
 {

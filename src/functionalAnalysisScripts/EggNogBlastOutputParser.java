@@ -60,10 +60,10 @@ public class EggNogBlastOutputParser
 	
 	public static class MutableInt
 	{
-		  int value = 1; // note that we start at 1 since we're counting
-		  public void increment () { ++value;      }
-		  public int  get ()       { return value; }
-		  //public void set(int newValue)      {this.value = value + newValue;}
+		int value = 1; // note that we start at 1 since we're counting
+		public void increment () { ++value;      }
+		public int  get ()       { return value; }
+		//public void set(int newValue)      {this.value = value + newValue;}
 	}
 	
 	public static HashMap<String,MutableInt> readWGSBlastFile(String blastFilepath, HashMap<String,String> orgTaxonMap) throws Exception
@@ -137,23 +137,6 @@ public class EggNogBlastOutputParser
 		return speciesMap;
 	}
 	
-	public static HashMap<String,Integer> readCopyCountFile(String copyCountFilepath) throws Exception
-	{
-		HashMap<String,Integer> countMap = new HashMap<String,Integer>();
-		BufferedReader reader = new BufferedReader(new FileReader(copyCountFilepath));
-		String nextLine = reader.readLine(); nextLine = reader.readLine();
-		while(nextLine != null)
-		{
-			//System.out.println(nextLine);
-			SixteenSCopyCount info = new SixteenSCopyCount(nextLine);
-			countMap.put(info.getStrainName(),info.getCopyCount());
-			nextLine = reader.readLine();
-		}
-		reader.close();
-		return countMap;
-	}
-	
-	
 	public static HashMap<String,String> readDescriptionFile(String filepath) throws Exception
 	{
 		HashMap<String,String> map = new HashMap<String,String>();
@@ -172,41 +155,7 @@ public class EggNogBlastOutputParser
 		
 	}
 	
-	public static HashMap<String,HashMap<String,Long>> readPredictionFile(String filepath) throws Exception
-	{
-		HashMap<String, HashMap<String, Long>> outerMap = new HashMap<String, HashMap<String,Long>>();
-		BufferedReader reader = new BufferedReader(new FileReader(filepath));
-		String nextLine = reader.readLine();
-		String[] taxIDs = nextLine.split("\t");
-		for( int i = 1; i< taxIDs.length; i++ )
-		{
-			HashMap<String,Long> innerMap = outerMap.get(taxIDs[i]);
-			if(innerMap == null)
-			{
-				innerMap = new HashMap <String,Long>();
-				outerMap.put(taxIDs[i],innerMap);
-			}
-			
-		}
-		nextLine = reader.readLine();
-		while(nextLine != null)
-		{
-			for( int i = 1; i< taxIDs.length; i++ )
-			{
-				Long count = outerMap.get(taxIDs[i]).get(nextLine.split("\t")[0]);
-				if(count == null)
-				{
-					count=Long.parseLong(nextLine.split("\t")[i]);
-				}
-				outerMap.get(taxIDs[i]).put(nextLine.split("\t")[0],count);
-				
-			}
-			nextLine = reader.readLine();
-		}
-		reader.close();
-		return outerMap;
-		
-	}
+
 	
 	public static List<FunctionObject> readFunctionFile(String functionFilepath) throws Exception
 	{
@@ -345,45 +294,6 @@ public class EggNogBlastOutputParser
 		
 	}
 	
-	public static HashMap<String, String> makeOrgCodeTaxonMap(String filepath) throws Exception
-	{
-		HashMap<String, String> map = new HashMap<String, String>();
-		BufferedReader reader = new BufferedReader(new FileReader(filepath));
-		String nextLine = reader.readLine();
-		while(nextLine != null)
-		{
-			if(nextLine.split("TAX:").length > 1)
-			{
-				//System.out.println(nextLine);
-				OrgCodeTaxonID info = new OrgCodeTaxonID(nextLine);
-				map.put(info.getOrgCode(), info.getTaxonID());
-			}
-			nextLine = reader.readLine();
-		}
-		reader.close();
-		return map;
-		
-	}
-	
-	public static HashMap<String, String> makeTaxonStrainNameMap(String filepath) throws Exception
-	{
-		HashMap<String, String> map = new HashMap<String, String>();
-		BufferedReader reader = new BufferedReader(new FileReader(filepath));
-		String nextLine = reader.readLine();
-		while(nextLine != null)
-		{
-			if(nextLine.split("TAX:").length > 1)
-			{
-				//System.out.println(nextLine);
-				OrgCodeTaxonID info = new OrgCodeTaxonID(nextLine);
-				map.put(info.getTaxonID(),info.getStrainName().toLowerCase());
-			}
-			nextLine = reader.readLine();
-		}
-		reader.close();
-		return map;
-		
-	}
 	
 	public static HashMap<String, Integer> makeTaxonCopyMap(HashMap<String,String> taxonStrainNameMap, HashMap<String,Integer> StrainCopyCountMap, String filepath, String filepath2) throws Exception
 	{
@@ -990,7 +900,7 @@ public class EggNogBlastOutputParser
         writer.flush();  writer.close();
       } 
 
-      // modified from Dr. Fodor's metagenomics tools eTree/PivotToSpreadsheet
+      // modified from Dr. Fodor's metagenomics tools in GitHub (eTree/PivotToSpreadsheet)
 	  public static void writeTaxonFamilyPivotList( String outFile, HashMap<String, HashMap<String, Integer>> outerMap ) throws Exception
       {
               HashSet<String> families = new HashSet<String>();
