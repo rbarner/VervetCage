@@ -2,7 +2,7 @@ package functionalAnalysisScripts;
 
 import java.io.IOException;
 
-public class BlastOutput extends databaseSearchOutput
+public class BlatOutput extends databaseSearchOutput
 {
 	private String queryID;
 	private String targetID;
@@ -22,7 +22,7 @@ public class BlastOutput extends databaseSearchOutput
 	 * Constructors                
 	 * @throws IOException *
 	 ******************************/ 
-	public BlastOutput(String aLine) throws IOException
+	public BlatOutput(String aLine) throws IOException
 	{
 		this.queryID = aLine.split("\t")[0];
 		this.targetID = aLine.split("\t")[1];

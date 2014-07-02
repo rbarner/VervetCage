@@ -12,24 +12,27 @@ import java.util.HashSet;
 import java.util.List;
 
 
-public class EggNogBlastOutputParser
+public class EggNogParser
 {
 	
-	private List<BlastOutput> resultsList; 
+	private List<databaseSearchOutput> resultsList; 
 	
 	/******************************
 	 * Constructor                *
 	 ******************************/
-	public EggNogBlastOutputParser(String blastFilepath) throws Exception
+	public EggNogParser(String blastFilepath, boolean blastx ) throws Exception
 	{
-		this.resultsList= readBlastFile(blastFilepath);
+		if(blastx == true)
+			this.resultsList= readBlastFile(blastFilepath);
+		else
+			this.resultsList = readBlatFile(blastFilepath);
 	}
 	
 	
 	/******************************
 	 * Getters                    *
 	 ******************************/
-	public List<BlastOutput> getResultsList()
+	public List<databaseSearchOutput> getResultsList()
 	{
 		return this.resultsList;
 	}
@@ -40,9 +43,9 @@ public class EggNogBlastOutputParser
 	 ******************************/
 
 	/****    Read in files *******/
-	public List<BlastOutput> readBlastFile(String blastFilepath) throws Exception
+	public List<databaseSearchOutput> readBlastFile(String blastFilepath) throws Exception
 	{
-		List<BlastOutput> list = new ArrayList<BlastOutput>();
+		List<databaseSearchOutput> list = new ArrayList<databaseSearchOutput>();
 		BufferedReader reader = new BufferedReader(new FileReader(blastFilepath));
 		String nextLine = reader.readLine();
 		while(nextLine != null)
@@ -56,6 +59,21 @@ public class EggNogBlastOutputParser
 		return list;	
 	}
 	
+	public List<databaseSearchOutput> readBlatFile(String blastFilepath) throws Exception
+	{
+		List<databaseSearchOutput> list = new ArrayList<databaseSearchOutput>();
+		BufferedReader reader = new BufferedReader(new FileReader(blastFilepath));
+		String nextLine = reader.readLine();
+		while(nextLine != null)
+		{
+			//System.out.println(nextLine);
+			BlatOutput info = new BlatOutput(nextLine);
+			list.add(info);
+			nextLine = reader.readLine();
+		}
+		reader.close();
+		return list;	
+	}
 	
 	public static class MutableInt
 	{
@@ -239,7 +257,7 @@ public class EggNogBlastOutputParser
 			}
 
 			//List<FunctionObject> functionList =EggNogBlastOutputParser.readFunctionFile(dirPath + "/" + nextLine +"/" + nextLine + "_16SFunctionalListLevel"+level+".txt");
-			List<FunctionObject> functionList =EggNogBlastOutputParser.readFunctionFile(dirPath + "/" + nextLine);
+			List<FunctionObject> functionList =EggNogParser.readFunctionFile(dirPath + "/" + nextLine);
 			for(FunctionObject function : functionList)
 			{
 				Long count = innerMap.get(function.getName());
@@ -524,20 +542,20 @@ public class EggNogBlastOutputParser
 		
 		//Make WGS blast split lists
 		 // /**
-		List<EggNOGMember> memberList = EggNogBlastOutputParser.readMemberFile("/Users/rbarner/hmp_data/eggNog/eggNOGfiles/bactNOG.members.txt");
+		List<EggNOGMember> memberList = EggNogParser.readMemberFile("/Users/rbarner/hmp_data/eggNog/eggNOGfiles/bactNOG.members.txt");
 
-		HashMap<Character,List<String>> funcMap = EggNogBlastOutputParser.functionalMap("/Users/rbarner/hmp_data/eggNog/fun.txt");
+		HashMap<Character,List<String>> funcMap = EggNogParser.functionalMap("/Users/rbarner/hmp_data/eggNog/fun.txt");
 		System.out.println("Made functional map");
-		HashMap<String,String> descriptionMap = EggNogBlastOutputParser.readDescriptionFile("/Users/rbarner/hmp_data/eggNog/eggNOGfiles/bactNOG.description.txt");
+		HashMap<String,String> descriptionMap = EggNogParser.readDescriptionFile("/Users/rbarner/hmp_data/eggNog/eggNOGfiles/bactNOG.description.txt");
 		System.out.println("Made description map : "+ descriptionMap.size());
-		EggNogBlastOutputParser.setFunccatInfo(memberList, funcMap, "/Users/rbarner/hmp_data/eggNog/eggNOGfiles/bactNOG.funccat.txt");
+		EggNogParser.setFunccatInfo(memberList, funcMap, "/Users/rbarner/hmp_data/eggNog/eggNOGfiles/bactNOG.funccat.txt");
 		System.out.println("Set function in member list");
-		EggNogBlastOutputParser.setDescriptionInfo(memberList, descriptionMap);
+		EggNogParser.setDescriptionInfo(memberList, descriptionMap);
 		System.out.println("Set description info for member list");
 				
-		HashMap<String, List<String>> memberHash1 = EggNogBlastOutputParser.makeWGSMemberHashMapLevel1(memberList);
-		HashMap<String, List<String>> memberHash2 = EggNogBlastOutputParser.makeWGSMemberHashMapLevel2(memberList);
-		HashMap<String, EggNOGMember> memberHash34 = EggNogBlastOutputParser.makeMemberDescriptionHashMap(memberList);
+		HashMap<String, List<String>> memberHash1 = EggNogParser.makeWGSMemberHashMapLevel1(memberList);
+		HashMap<String, List<String>> memberHash2 = EggNogParser.makeWGSMemberHashMapLevel2(memberList);
+		HashMap<String, EggNOGMember> memberHash34 = EggNogParser.makeMemberDescriptionHashMap(memberList);
 		System.out.println("Created member description hash map");
 		
 		
@@ -556,19 +574,19 @@ public class EggNogBlastOutputParser
 			while(nextSplit != null)
 			{
 				System.out.println(nextSplit);
-				HashMap<String,MutableInt> blastMap = EggNogBlastOutputParser.readWGSBlastFile("/Users/rbarner/hmp_data/eggNog/Vervet/_WGSblast/"+ nextSample + "/"+ nextSplit, orgTaxonMap);
+				HashMap<String,MutableInt> blastMap = EggNogParser.readWGSBlastFile("/Users/rbarner/hmp_data/eggNog/Vervet/_WGSblast/"+ nextSample + "/"+ nextSplit, orgTaxonMap);
 				System.out.println("read in blast and member files");
 	
-				HashMap<String,Integer> outerMap1 = EggNogBlastOutputParser.makeWGSHashMap(blastMap,memberHash1);
-				HashMap<String,Integer> outerMap2 = EggNogBlastOutputParser.makeWGSHashMap(blastMap,memberHash2);
-				HashMap<String,Integer> outerMap3 = EggNogBlastOutputParser.makeWGSHashMapDescription(blastMap,memberHash34);
-				HashMap<String,Integer> outerMap4 = EggNogBlastOutputParser.makeWGSHashMapLevel4(blastMap,memberHash34);
+				HashMap<String,Integer> outerMap1 = EggNogParser.makeWGSHashMap(blastMap,memberHash1);
+				HashMap<String,Integer> outerMap2 = EggNogParser.makeWGSHashMap(blastMap,memberHash2);
+				HashMap<String,Integer> outerMap3 = EggNogParser.makeWGSHashMapDescription(blastMap,memberHash34);
+				HashMap<String,Integer> outerMap4 = EggNogParser.makeWGSHashMapLevel4(blastMap,memberHash34);
 				System.out.println("created description count map");
 
-				EggNogBlastOutputParser.writeWGSLevel34FunctionList("/Users/rbarner/hmp_data/eggNog/Vervet/_WGSblast/"+ nextSample +"/"+ nextSplit + "_WGSFunctionalListLevel1.txt", outerMap1);
-				EggNogBlastOutputParser.writeWGSLevel34FunctionList("/Users/rbarner/hmp_data/eggNog/Vervet/_WGSblast/"+ nextSample +"/"+ nextSplit + "_WGSFunctionalListLevel2.txt", outerMap2);
-				EggNogBlastOutputParser.writeWGSLevel34FunctionList("/Users/rbarner/hmp_data/eggNog/Vervet/_WGSblast/"+ nextSample +"/"+ nextSplit + "_WGSFunctionalListLevel3.txt", outerMap3);
-				EggNogBlastOutputParser.writeWGSLevel34FunctionList("/Users/rbarner/hmp_data/eggNog/Vervet/_WGSblast/"+ nextSample +"/"+ nextSplit + "_WGSFunctionalListLevel4.txt", outerMap4);
+				EggNogParser.writeWGSLevel34FunctionList("/Users/rbarner/hmp_data/eggNog/Vervet/_WGSblast/"+ nextSample +"/"+ nextSplit + "_WGSFunctionalListLevel1.txt", outerMap1);
+				EggNogParser.writeWGSLevel34FunctionList("/Users/rbarner/hmp_data/eggNog/Vervet/_WGSblast/"+ nextSample +"/"+ nextSplit + "_WGSFunctionalListLevel2.txt", outerMap2);
+				EggNogParser.writeWGSLevel34FunctionList("/Users/rbarner/hmp_data/eggNog/Vervet/_WGSblast/"+ nextSample +"/"+ nextSplit + "_WGSFunctionalListLevel3.txt", outerMap3);
+				EggNogParser.writeWGSLevel34FunctionList("/Users/rbarner/hmp_data/eggNog/Vervet/_WGSblast/"+ nextSample +"/"+ nextSplit + "_WGSFunctionalListLevel4.txt", outerMap4);
 				System.out.println("Wrote wgs "+ nextSplit +" table");
 	
 				nextSplit = splitReader.readLine();
